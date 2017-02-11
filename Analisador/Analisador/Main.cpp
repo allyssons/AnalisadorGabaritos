@@ -71,6 +71,8 @@ int main() {
 				else if (opcao == 4) {
 					operacoes->converteBinaria();
 					operacoes->armazenaImagemProcessada(idArquivo, false);
+					operacoes->encontraRetangulo();
+					operacoes->armazenaImagemProcessada(idArquivo+"1", false);
 				}
 				idArquivo += "1";
 				i++;

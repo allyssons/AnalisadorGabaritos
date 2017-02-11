@@ -38,6 +38,8 @@ public:
 	void setMatriz(unsigned char** matriz);
 	string getCaminho(int position);
 	void converteBinaria();
+	void encontraRetangulo();
+	int checkMascara(int a, int b);
 };
 
 // Obtém arquivos do diretório especificado, retorna lista com o caminho dos arquivos
@@ -630,6 +632,39 @@ void Operacoes::converteFloydSteinberg() {
 	bmp->getBiih()->setBiSizeImage(bmp->getBiih()->getBiHeight() * bmp->getBiih()->getBiWidth() + (calculaValorErro(1) *  bmp->getBiih()->getBiHeight())); // Tamanho = Tamanho sem lixo (largura x altura) + lixo
 }
 
+void Operacoes::encontraRetangulo() {
+	// Transforma Bitmap bits em matriz
+	transformaEmMatriz();
+
+	int ans;
+
+
+	for (int i = 0; i < bmp->getBiih()->getBiHeight(); i++) {
+		for (int j = 0; j < bmp->getBiih()->getBiWidth(); j++) {
+
+			if (matriz[i][j] == 0) {
+				ans = checkMascara(i,j);
+				if (ans == 0) {
+					
+				}
+			}
+		}
+	}
+}
+
+int Operacoes::checkMascara(int a, int b) {
+
+	for (int i = a; i < 1000; i++) {
+		for (int j = b; j < 1000; j++) {
+			if (matriz[i][j] != 0) {
+				return 1;
+			}
+		}
+	}
+	return 0;
+
+}
+
 void Operacoes::converteBinaria() {
 	unsigned char limiar = 98;
 
@@ -705,9 +740,8 @@ void Operacoes::converteBinaria() {
 	bmp->getBiih()->setBiSizeImage(bmp->getBiih()->getBiHeight() * bmp->getBiih()->getBiWidth() + (calculaValorErro(1) *  bmp->getBiih()->getBiHeight())); // Tamanho = Tamanho sem lixo (largura x altura) + lixo
 }
 
-
-
 string Operacoes::getCaminho(int position) {
 	return caminhosArquivos[position];
 }
+
 

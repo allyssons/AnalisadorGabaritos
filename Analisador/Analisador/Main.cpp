@@ -15,8 +15,8 @@ int main() {
 	string caminhoPasta;
 
 	cout << "Pasta: ";
-	cin >> caminhoPasta;
-
+	//cin >> caminhoPasta;
+	caminhoPasta = "C:\\Imagens";
 
 	operacoes->setCaminhoPasta(caminhoPasta);
 
@@ -70,8 +70,7 @@ int main() {
 				}
 				else if (opcao == 4) {
 					operacoes->converteBinaria();
-					operacoes->armazenaImagemProcessada(idArquivo + "Bin", false);
-					operacoes->achaBola();
+					operacoes->vetorResposta();
 					operacoes->armazenaImagemProcessada(idArquivo+ "Ret", false);
 				}
 				idArquivo += "1";

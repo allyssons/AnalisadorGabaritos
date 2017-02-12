@@ -16,6 +16,7 @@ private:
 	FILE *file;
 	unsigned char** matriz;
 	int** matrizRetangulo;
+	int matrizBolas[50][2];
 public:
 	void obtemArquivos(string caminhoPasta); // Obtém dos arquivos no diretório especificado
 	void abreArquivo(string caminhoArquivo); // Abre um arquivo
@@ -43,6 +44,8 @@ public:
 	int checkMascara(int a, int b);
 	void ordenaRetangulo();
 	void achaBola();
+	int checaBola(int a, int b);
+	void vetorResposta();
 };
 
 // Obtém arquivos do diretório especificado, retorna lista com o caminho dos arquivos
@@ -673,23 +676,42 @@ void Operacoes::encontraRetangulo() {
 }
 
 void Operacoes::achaBola() {
+	for (int i = 0; i < 50; i++) {
+		for (int j = 0; j < 2; j++) {
+			matrizBolas[i][j] = 0;
+		}
+	}
 	encontraRetangulo();
 	ordenaRetangulo();
 	double dist1 = sqrt(pow(abs(matrizRetangulo[0][0] - matrizRetangulo[1][0]), 2) + pow(abs(matrizRetangulo[0][1] - matrizRetangulo[1][1]), 2));
 	double dist2 = sqrt(pow(abs(matrizRetangulo[0][0] - matrizRetangulo[2][0]), 2) + pow(abs(matrizRetangulo[0][1] - matrizRetangulo[2][1]), 2));
-
+	int w = 0;
+	int z = 0;
 	double k = 0;
-	
+	int flag = -1;
 	int fDesloc = dist2 * 0.2173; //Proporcao do ponto do retangulo 0 até o primeiro segmento
 	int oDesloc = fDesloc + (dist2 * 0.1739); //Proponcao entre cada segmento
-
 	double aux0 = matrizRetangulo[0][0] + fDesloc;
 	double aux1 = matrizRetangulo[0][1] + 20;
-
-	matriz[(int)aux0][(int)aux1] = 0;
 	k = (double)(matrizRetangulo[1][0] - matrizRetangulo[0][0]) / (matrizRetangulo[1][1] - matrizRetangulo[0][1]);
 	for (int j = 0; j < dist1; j++) {
-		matriz[(int)aux0][(int)aux1] = 0;
+		if (matriz[(int)aux0][(int)aux1] == 0) {
+			flag = checaBola(aux0, aux1);
+
+			if (flag == 0) {
+				for (int b = aux1; b < (45 + aux1); b++) {
+					matriz[(int)aux0][b] = 255;
+				}
+				matrizRetangulo[w][z] = aux0;
+				z++;
+				matrizRetangulo[w][z] = aux1;
+				z = 0;
+				w++;
+				aux0 += k * 50;
+				aux1 += 50;
+			}
+
+		}
 		aux0 += k;
 		aux1++;
 	}
@@ -697,31 +719,51 @@ void Operacoes::achaBola() {
 	for(int i = 0; i < 4; i++){
 		aux0 = matrizRetangulo[0][0] + oDesloc;
 		aux1 = matrizRetangulo[0][1] + 20;
-		matriz[(int)aux0][(int)aux1] = 0;
 		oDesloc += (dist2 * 0.1739);
 		k = (double) (matrizRetangulo[1][0] - matrizRetangulo[0][0]) / (matrizRetangulo[1][1] - matrizRetangulo[0][1]);
 		for (int j = 0; j < dist1; j++) {
-			matriz[(int)aux0][(int)aux1] = 0;
+			if (matriz[(int)aux0][(int)aux1] == 0) {
+				flag = checaBola(aux0, aux1);
+				if (flag == 0) {
+
+					for (int b = aux1; b < (45 + aux1); b++) {
+						matriz[(int)aux0][b] = 255;
+					}
+					matrizBolas[w][z] = aux0;
+					z++;
+					matrizBolas[w][z] = aux1;
+					z = 0;
+					w++;
+					aux0 += k * 50;
+					aux1 += 50;
+					j += 50;
+				}
+			}
 			aux0+=k;
 			aux1++;
 		}
 	}
+}
 
-
-
-
-
-
-	int posicaoBitmap = 0;
-	for (int i = bmp->getBiih()->getBiHeight() - 1; i >= 0; i--) {
-		for (int j = 0; j < bmp->getBiih()->getBiWidth(); j++) {
-			bmp->setBitmapBitsB(matriz[i][j], posicaoBitmap);
-			bmp->setBitmapBitsG(matriz[i][j], posicaoBitmap);
-			bmp->setBitmapBitsR(matriz[i][j], posicaoBitmap);
-			posicaoBitmap++;
-		}
+void Operacoes::vetorResposta() {
+	achaBola();
+	printf("\nTESTANDO MATRIZ\n");
+	for (int i = 0; i < 50; i++) {
+		printf("%d - ", matrizBolas[i][0]);
+		printf("%d\n", matrizBolas[i][1]);
 	}
 
+}
+
+int Operacoes::checaBola(int a, int b) {
+
+	for (int i = b; i < (30 + b); i++) {
+		if (matriz[a][i] != 0) {
+			return 1;
+		}
+		if (i == bmp->getBiih()->getBiWidth()) return 1;
+	}
+	return 0;
 }
 
 void Operacoes::ordenaRetangulo(){

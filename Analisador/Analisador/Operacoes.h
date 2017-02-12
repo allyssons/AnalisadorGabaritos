@@ -15,6 +15,7 @@ private:
 	BMP *bmp;
 	FILE *file;
 	unsigned char** matriz;
+	int** matrizRetangulo;
 public:
 	void obtemArquivos(string caminhoPasta); // Obtém dos arquivos no diretório especificado
 	void abreArquivo(string caminhoArquivo); // Abre um arquivo
@@ -40,6 +41,8 @@ public:
 	void converteBinaria();
 	void encontraRetangulo();
 	int checkMascara(int a, int b);
+	void ordenaRetangulo();
+	void achaBola();
 };
 
 // Obtém arquivos do diretório especificado, retorna lista com o caminho dos arquivos
@@ -636,35 +639,146 @@ void Operacoes::encontraRetangulo() {
 	// Transforma Bitmap bits em matriz
 	transformaEmMatriz();
 
+	//Armazenará o valor de cada retangulo
+	matrizRetangulo = new int*[3];
+	for (int i = 0; i < 3; i++) {
+		matrizRetangulo[i] = new int[2];
+	}
+	int w = 0;
+	int z = 0;
 	int ans;
-
 
 	for (int i = 0; i < bmp->getBiih()->getBiHeight(); i++) {
 		for (int j = 0; j < bmp->getBiih()->getBiWidth(); j++) {
 
 			if (matriz[i][j] == 0) {
-				ans = checkMascara(i,j);
+				ans = checkMascara(i, j);
 				if (ans == 0) {
-					
+					matrizRetangulo[w][z] = i;
+					z++;
+					matrizRetangulo[w][z] = j;
+					z= 0;
+					w++;
+					for (int a = i; a < (40+i); a++) {
+						for (int b = j; b < (90+j); b++) {
+							matriz[a][b] = 255;
+							if (b == bmp->getBiih()->getBiWidth()) break;
+						}
+						if (a == bmp->getBiih()->getBiHeight()) break;
+					}
 				}
 			}
 		}
 	}
 }
 
-int Operacoes::checkMascara(int a, int b) {
+void Operacoes::achaBola() {
+	encontraRetangulo();
+	ordenaRetangulo();
+	double dist1 = sqrt(pow(abs(matrizRetangulo[0][0] - matrizRetangulo[1][0]), 2) + pow(abs(matrizRetangulo[0][1] - matrizRetangulo[1][1]), 2));
+	double dist2 = sqrt(pow(abs(matrizRetangulo[0][0] - matrizRetangulo[2][0]), 2) + pow(abs(matrizRetangulo[0][1] - matrizRetangulo[2][1]), 2));
 
-	for (int i = a; i < 1000; i++) {
-		for (int j = b; j < 1000; j++) {
+	double k = 0;
+	
+	int fDesloc = dist2 * 0.2173; //Proporcao do ponto do retangulo 0 até o primeiro segmento
+	int oDesloc = fDesloc + (dist2 * 0.1739); //Proponcao entre cada segmento
+
+	double aux0 = matrizRetangulo[0][0] + fDesloc;
+	double aux1 = matrizRetangulo[0][1] + 20;
+
+	matriz[(int)aux0][(int)aux1] = 0;
+	k = (double)(matrizRetangulo[1][0] - matrizRetangulo[0][0]) / (matrizRetangulo[1][1] - matrizRetangulo[0][1]);
+	for (int j = 0; j < dist1; j++) {
+		matriz[(int)aux0][(int)aux1] = 0;
+		aux0 += k;
+		aux1++;
+	}
+
+	for(int i = 0; i < 4; i++){
+		aux0 = matrizRetangulo[0][0] + oDesloc;
+		aux1 = matrizRetangulo[0][1] + 20;
+		matriz[(int)aux0][(int)aux1] = 0;
+		oDesloc += (dist2 * 0.1739);
+		k = (double) (matrizRetangulo[1][0] - matrizRetangulo[0][0]) / (matrizRetangulo[1][1] - matrizRetangulo[0][1]);
+		for (int j = 0; j < dist1; j++) {
+			matriz[(int)aux0][(int)aux1] = 0;
+			aux0+=k;
+			aux1++;
+		}
+	}
+
+
+
+
+
+
+	int posicaoBitmap = 0;
+	for (int i = bmp->getBiih()->getBiHeight() - 1; i >= 0; i--) {
+		for (int j = 0; j < bmp->getBiih()->getBiWidth(); j++) {
+			bmp->setBitmapBitsB(matriz[i][j], posicaoBitmap);
+			bmp->setBitmapBitsG(matriz[i][j], posicaoBitmap);
+			bmp->setBitmapBitsR(matriz[i][j], posicaoBitmap);
+			posicaoBitmap++;
+		}
+	}
+
+}
+
+void Operacoes::ordenaRetangulo(){
+	int matrizAux[3][2];
+	//Copia a matriz
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 2; j++) {
+			matrizAux[i][j] = matrizRetangulo[i][j];
+		}
+	}
+
+	//Encontra retangulo de maior Y
+	int maiorY = -1;
+	int valMaiorY = -1;
+	for(int i = 0; i < 3; i++){
+		if (valMaiorY < matrizAux[i][1]) {
+			maiorY = i;
+			valMaiorY = matrizAux[i][1];
+		}
+	}
+	matrizRetangulo[1][0] = matrizAux[maiorY][0];
+	matrizRetangulo[1][1] = matrizAux[maiorY][1];
+
+	//Encontra retangulo de maior X
+	int maiorX = -1;
+	int valMaiorX = -1;
+	for(int i = 0; i < 3; i++){
+		if (maiorX < matrizAux[i][0]) {
+			maiorX = i;
+			valMaiorX = matrizAux[i][0];
+		}
+	}
+	matrizRetangulo[2][0] = matrizAux[maiorX][0];
+	matrizRetangulo[2][1] = matrizAux[maiorX][1];
+
+
+	//Encontra o outro
+	matrizRetangulo[0][0] = matrizAux[3 - (maiorX + maiorY)][0];
+	matrizRetangulo[0][1] = matrizAux[3 - (maiorX + maiorY)][1];
+
+}
+
+int Operacoes::checkMascara(int a, int b) {
+	for (int i = a; i < (40+a); i++) {
+		for (int j = b; j < (90 + b); j++) {
 			if (matriz[i][j] != 0) {
 				return 1;
+				if (j == bmp->getBiih()->getBiWidth()) break;
 			}
+			if (i == bmp->getBiih()->getBiHeight()) break;
 		}
 	}
 	return 0;
 
 }
 
+//Converte uma imagem para uma imagem binária
 void Operacoes::converteBinaria() {
 	unsigned char limiar = 98;
 

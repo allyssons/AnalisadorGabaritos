@@ -53,7 +53,7 @@ int main() {
 			i = 0;
 
 			while (i < operacoes->getCaminhosArquivos().size()) {
-				cout << "i " << i << endl;
+				cout <<  i << endl;
 				// Abre arquivo
 				operacoes->abreArquivo(operacoes->getCaminho(i));
 
@@ -70,9 +70,9 @@ int main() {
 				}
 				else if (opcao == 4) {
 					operacoes->converteBinaria();
-					operacoes->armazenaImagemProcessada(idArquivo, false);
-					operacoes->encontraRetangulo();
-					operacoes->armazenaImagemProcessada(idArquivo+"1", false);
+					operacoes->armazenaImagemProcessada(idArquivo + "Bin", false);
+					operacoes->achaBola();
+					operacoes->armazenaImagemProcessada(idArquivo+ "Ret", false);
 				}
 				idArquivo += "1";
 				i++;

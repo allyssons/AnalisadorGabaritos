@@ -46,6 +46,7 @@ public:
 	void achaBola();
 	int checaBola(int a, int b);
 	void vetorResposta();
+	void ordenaBolas();
 };
 
 // Obtém arquivos do diretório especificado, retorna lista com o caminho dos arquivos
@@ -702,9 +703,9 @@ void Operacoes::achaBola() {
 				for (int b = aux1; b < (45 + aux1); b++) {
 					matriz[(int)aux0][b] = 255;
 				}
-				matrizRetangulo[w][z] = aux0;
+				matrizBolas[w][z] = 1; //Corresponde a letra "a"
 				z++;
-				matrizRetangulo[w][z] = aux1;
+				matrizBolas[w][z] = aux1;
 				z = 0;
 				w++;
 				aux0 += k * 50;
@@ -729,7 +730,7 @@ void Operacoes::achaBola() {
 					for (int b = aux1; b < (45 + aux1); b++) {
 						matriz[(int)aux0][b] = 255;
 					}
-					matrizBolas[w][z] = aux0;
+					matrizBolas[w][z] = i+2; //Corresponde a cada alternativa
 					z++;
 					matrizBolas[w][z] = aux1;
 					z = 0;
@@ -746,11 +747,36 @@ void Operacoes::achaBola() {
 }
 
 void Operacoes::vetorResposta() {
-	achaBola();
-	printf("\nTESTANDO MATRIZ\n");
+	achaBola(); //Encontra as respostas e seus respectivos Ys
+
+	double dist2 = sqrt(pow(abs(matrizRetangulo[0][0] - matrizRetangulo[1][0]), 2) + pow(abs(matrizRetangulo[0][1] - matrizRetangulo[1][1]), 2));
+	double distTQ = dist2 - dist2*(0.0652173); //Distancia de todas as questoes
+	double deslocKQ = distTQ / 10;//Distancia entre cada questao
+	double rangeInicial =0;
+	double rangeFinal = 0;
+
 	for (int i = 0; i < 50; i++) {
-		printf("%d - ", matrizBolas[i][0]);
-		printf("%d\n", matrizBolas[i][1]);
+		if (matrizBolas[i][1] == 0) {
+			break;
+		}
+		rangeInicial = matrizRetangulo[0][1] + dist2*(0.0652173);
+		rangeFinal = rangeInicial + deslocKQ;
+		for (int j = 0; j < 10; j++) {
+			//printf("Valor do Y - %d\n", matrizBolas[i][1]);
+			//printf("Range %lf - %lf\n", rangeInicial, rangeFinal);
+			if (matrizBolas[i][1] < rangeFinal && matrizBolas[i][1] > rangeInicial) {
+				//cout << "Entrou";
+				matrizBolas[i][1] = j + 1;
+				break;
+			}
+			rangeInicial = rangeFinal;
+			rangeFinal += deslocKQ;
+		}
+
+	}
+
+	for (int i = 0; i < 12; i++) {
+		printf("%d - %d\n", matrizBolas[i][0], matrizBolas[i][1]);
 	}
 
 }
@@ -764,6 +790,17 @@ int Operacoes::checaBola(int a, int b) {
 		if (i == bmp->getBiih()->getBiWidth()) return 1;
 	}
 	return 0;
+}
+
+void Operacoes::ordenaBolas() {
+	int maiorY = -1;
+	int valMaiorY = -1;
+	for (int i = 0; i < 50; i++) {
+		if (valMaiorY < matrizBolas[i][1]) {
+			maiorY = i;
+			valMaiorY = matrizBolas[i][1];
+		}
+	}
 }
 
 void Operacoes::ordenaRetangulo(){

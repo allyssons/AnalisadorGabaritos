@@ -114,6 +114,7 @@
     <ClInclude Include="BitmapFileHeader.h" />
     <ClInclude Include="BitmapInfoHeader.h" />
     <ClInclude Include="BMP.h" />
+    <ClInclude Include="Correcao.h" />
     <ClInclude Include="Operacoes.h" />
     <ClInclude Include="RGBQuad.h" />
   </ItemGroup>

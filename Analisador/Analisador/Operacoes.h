@@ -47,6 +47,7 @@ public:
 	int checaBola(int a, int b);
 	void vetorResposta();
 	void ordenaBolas();
+	void corrigeGabarito();
 };
 
 // Obtém arquivos do diretório especificado, retorna lista com o caminho dos arquivos
@@ -762,10 +763,7 @@ void Operacoes::vetorResposta() {
 		rangeInicial = matrizRetangulo[0][1] + dist2*(0.0652173);
 		rangeFinal = rangeInicial + deslocKQ;
 		for (int j = 0; j < 10; j++) {
-			//printf("Valor do Y - %d\n", matrizBolas[i][1]);
-			//printf("Range %lf - %lf\n", rangeInicial, rangeFinal);
 			if (matrizBolas[i][1] < rangeFinal && matrizBolas[i][1] > rangeInicial) {
-				//cout << "Entrou";
 				matrizBolas[i][1] = j + 1;
 				break;
 			}
@@ -775,12 +773,53 @@ void Operacoes::vetorResposta() {
 
 	}
 
-	for (int i = 0; i < 12; i++) {
-		printf("%d - %d\n", matrizBolas[i][0], matrizBolas[i][1]);
+}
+
+void Operacoes::corrigeGabarito() {
+	char respostas[10];
+	for (int i = 0; i < 10; i++) {
+		respostas[i] = 'Z';
+	}
+	//Procura respostas multiplas
+	for (int i = 0; i < 50; i++) {
+		if (matrizBolas[i][1] == 0) break;
+		for (int j = i; j < 50; j++) {
+			if (matrizBolas[j][1] == 0) break;
+			if (matrizBolas[i][1] == matrizBolas[j][1]) {
+				respostas[i] = 'X';
+				break;
+			}
+		}
+	}
+	int j;
+	int i;
+	for (j = 0; j < 10; j++) {
+		for (i = 0; i < 50; i++) {
+			if (matrizBolas[i][1] == 0) break;
+			if (matrizBolas[i][1] == j+1) {
+				break;
+			}
+		}
+		if (matrizBolas[i][1] == 0) {
+			respostas[j] = 'O';
+		}
+	}
+	int k = 0;
+	int aux;
+	for (int w = 0; w < 10; w++) {
+		if (respostas[w] == 'Z') continue;
+		while (w != matrizBolas[k][1]) {
+			k++;
+		}
+		aux = matrizBolas[k][0];
+		switch (aux)
+		{
+		default:
+			break;
+		}
 	}
 
 }
-
 int Operacoes::checaBola(int a, int b) {
 
 	for (int i = b; i < (30 + b); i++) {

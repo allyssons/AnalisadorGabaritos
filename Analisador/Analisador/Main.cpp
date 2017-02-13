@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Operacoes.h"
+#include "Correcao.h"
 #include <string>
 #include <string.h>
 
@@ -13,6 +14,13 @@ int main() {
 
 	Operacoes *operacoes = new Operacoes();
 	string caminhoPasta;
+	char alternativa[10];
+
+	cout << "Gabarito: ";
+	for (int i = 0; i < 10; i++) {
+		cin >> alternativa[i];
+	}
+	Correcao *correcao = new Correcao(alternativa);
 
 	cout << "Pasta: ";
 	//cin >> caminhoPasta;
